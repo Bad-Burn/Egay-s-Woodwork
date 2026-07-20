@@ -40,8 +40,23 @@ if (safeHost.includes('railway.internal')) {
   process.exit(1);
 }
 
-const remote = await mysql.createConnection({ uri: url, multipleStatements: true });
-console.log('Connected.\n');
+// mysql2 does not understand the "?ssl-mode=REQUIRED" query parameter that
+// Aiven puts in its Service URI, so translate it into a real ssl option.
+// Without this the server rejects the connection outright.
+const parsed = new URL(url);
+const wantsSsl =
+  /ssl-mode=required/i.test(parsed.search) || parsed.hostname.includes('aivencloud.com');
+
+const remote = await mysql.createConnection({
+  host: parsed.hostname,
+  port: Number(parsed.port || 3306),
+  user: decodeURIComponent(parsed.username),
+  password: decodeURIComponent(parsed.password),
+  database: parsed.pathname.replace(/^\//, ''),
+  ssl: wantsSsl ? { rejectUnauthorized: false } : undefined,
+  multipleStatements: true,
+});
+console.log(`Connected${wantsSsl ? ' (TLS)' : ''}.\n`);
 
 // ---- Schema -------------------------------------------------------------
 const sql = readFileSync(path.join(ROOT, 'schema.sql'), 'utf8');

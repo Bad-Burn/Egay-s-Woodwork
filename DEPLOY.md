@@ -11,8 +11,21 @@ Your `.env.local` points at `localhost`. **Vercel cannot reach a database on
 your PC.** Without this step the live site loads but shows no artworks, and the
 admin dashboard is empty.
 
-Free options: [Railway](https://railway.app), [Aiven](https://aiven.io),
-[TiDB Cloud](https://tidbcloud.com), [Clever Cloud](https://clever-cloud.com).
+### Which provider (checked July 2026)
+
+| Provider | Really free? | Notes |
+|---|---|---|
+| **Aiven** | **Yes — always free, no card** | 1 GB storage / 1 GB RAM / 1 CPU. Real MySQL, so this project is a drop-in. Service powers off after a long idle period. |
+| **TiDB Cloud Starter** | **Yes — no card** | 25 GiB storage + 250M request units/month. MySQL *wire-compatible* rather than actual MySQL — foreign keys and some DDL behave differently. |
+| Railway | **No** | Free tier was discontinued. You get trial credit, then it's a paid plan (~$5/mo). |
+| PlanetScale | **No** | Free tier removed in 2024. |
+
+For a site this size (a few hundred rows of text plus Cloudinary image URLs),
+Aiven's 1 GB is far more than enough — the images live on Cloudinary, not in
+the database.
+
+Free tiers change often. Check the provider's current pricing page before
+committing.
 
 ### Railway (what you're using)
 
@@ -52,10 +65,20 @@ Then map the URL's parts onto the Vercel variables in step 4:
 | port (e.g. `23456`) | `MYSQL_PORT` |
 | path after the `/` (usually `railway`) | `MYSQL_DATABASE` |
 
-### Other providers
+### Aiven (or any other provider)
 
-Aiven / TiDB / Clever Cloud work the same way — use their connection URI as
-`REMOTE_MYSQL_URL`. With a `mysql` CLI you can instead run:
+Identical process — the import script takes any MySQL connection URI:
+
+1. Create the free MySQL service, then copy its **Service URI** from the
+   Aiven console (it looks like
+   `mysql://avnadmin:password@mysql-xxxx.aivencloud.com:12345/defaultdb`).
+2. Put it in `.env.local` as `REMOTE_MYSQL_URL=...`
+3. `node scripts/db-import.mjs --with-data`
+
+Switching providers later costs about a minute — the script recreates the
+schema and re-copies your artworks anywhere.
+
+With a `mysql` CLI you can instead run:
 
 ```bash
 mysql -h <host> -P <port> -u <user> -p <database> < schema.sql
