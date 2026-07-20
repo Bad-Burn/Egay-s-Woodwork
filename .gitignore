@@ -1,9 +1,16 @@
 node_modules
 .next
-.env.local
-.env
 dist
+out
 *.log
 .DS_Store
-out
 .vercel
+
+# Every env file is ignored by default; only the placeholder template is
+# tracked. This is deliberately a blanket rule -- listing files one by one is
+# how a .env.production or .env.backup eventually gets committed by accident.
+.env*
+!.env.example
+
+# Local-only credential scratch files
+vercel-env.local.txt
