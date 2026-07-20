@@ -1,0 +1,175 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-paper text-ink antialiased font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brass ring-offset-2 ring-offset-paper rounded-sm;
+  }
+
+  ::selection {
+    @apply bg-brass/25 text-ink;
+  }
+
+  /* Honour the OS "reduce motion" setting across every animation we ship. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* ---- Type primitives ---------------------------------------------- */
+
+  /* Small uppercase label that sits above headings. */
+  .eyebrow {
+    @apply font-sans text-eyebrow uppercase font-medium text-brass;
+  }
+
+  /* Eyebrow with a leading hairline, used to open a section. */
+  .eyebrow-rule {
+    @apply eyebrow flex items-center gap-3 before:h-px before:w-8 before:bg-brass/50 before:content-[''];
+  }
+
+  .lede {
+    @apply text-lg sm:text-xl leading-relaxed text-ink/70 font-light;
+  }
+
+  /* ---- Buttons ------------------------------------------------------- */
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2.5 font-sans text-sm font-medium
+           tracking-wide px-7 py-3.5 rounded-full transition-all duration-300 ease-editorial
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-paper hover:bg-brass hover:text-ink;
+  }
+  .btn-outline {
+    @apply btn border border-ink/20 text-ink hover:border-ink hover:bg-ink hover:text-paper;
+  }
+  .btn-ghost {
+    @apply btn border border-paper/40 text-paper hover:bg-paper hover:text-ink;
+  }
+  /* Legacy alias so older markup keeps a sensible look. */
+  .btn-dark {
+    @apply btn-primary;
+  }
+
+  /* Text link that draws its underline on hover. */
+  .link-underline {
+    @apply relative inline-flex items-center gap-2 font-sans text-sm tracking-wide
+           after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full
+           after:origin-right after:scale-x-0 after:bg-current after:transition-transform
+           after:duration-500 after:ease-editorial
+           hover:after:origin-left hover:after:scale-x-100;
+  }
+
+  /* ---- Surfaces ------------------------------------------------------ */
+
+  .card {
+    @apply bg-white rounded-lg shadow-card border border-ink/5;
+  }
+
+  /* Hairline-framed block — the editorial alternative to a drop-shadow card. */
+  .frame {
+    @apply border border-ink/10 bg-white/60 backdrop-blur-sm;
+  }
+
+  .chip {
+    @apply font-sans text-xs tracking-wide px-4 py-2 rounded-full border border-ink/12
+           text-ink/60 transition-colors duration-300 hover:border-ink/40 hover:text-ink;
+  }
+  .chip-active {
+    @apply border-ink bg-ink text-paper hover:text-paper;
+  }
+
+  .field {
+    @apply w-full bg-transparent border-0 border-b border-ink/15 px-0 py-3 text-ink
+           placeholder:text-ink/30 transition-colors duration-300
+           focus:outline-none focus:ring-0 focus:border-brass;
+  }
+
+  .field-label {
+    @apply eyebrow block mb-2 text-ink/40;
+  }
+
+  /* ---- Media --------------------------------------------------------- */
+
+  /* Slow zoom on hover — the standard gallery-thumbnail gesture. */
+  .media-zoom {
+    @apply object-cover transition-transform duration-[1200ms] ease-editorial
+           group-hover:scale-[1.06];
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden bg-canvas rounded;
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full;
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0.6) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer 1.6s infinite;
+  }
+}
+
+@layer utilities {
+  /* Scroll-reveal: hidden until <Reveal> marks the element visible. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .reveal-visible {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Thin rule used to separate editorial sections. */
+  .rule {
+    @apply h-px w-full bg-ink/10;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
